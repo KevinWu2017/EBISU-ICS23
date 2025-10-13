@@ -24,7 +24,9 @@ set_target_properties(${reference_goal} PROPERTIES
 set(archlist " -gencode arch=compute_80,code=sm_80 ")
 # string(APPEND archlist " -gencode arch=compute_70,code=sm_70 ")
 
-set(DEFAULT_COMPILER_FLAG "-D_TIMER_ ")
+set(TIMESTEMPS_HALO1_BOX_TILEY8_FLOAT 8 CACHE STRING "Number of temporal steps for halo1 box TileY8 float kernels")
+
+set(DEFAULT_COMPILER_FLAG "-D_TIMER_ -DTIMESTEMPS_HALO1_BOX_TILEY8_FLOAT=${TIMESTEMPS_HALO1_BOX_TILEY8_FLOAT}")
 
 set(COMPILECG " -rdc=true -Xptxas \"-v \"")
 
