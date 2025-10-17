@@ -11,7 +11,7 @@ namespace cg = cooperative_groups;
 
 template <class REAL, int halo, int LOCAL_TILE_Y, int LOCAL_DEPTH>
 __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_y, int width_x,
-                                            REAL *__var_4__)
+                                            REAL *__var_4__, REAL *filter_gm)
 {
   // stencilParaT;
   const REAL west[3] = {12.0 / 118, 9.0 / 118, 9.0 / 118};
@@ -139,5 +139,5 @@ __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_
   }
 }
 
-template __global__ void kernel_temporal_traditional<double, HALO>(double *__restrict__, int, int, double *);
-template __global__ void kernel_temporal_traditional<float, HALO>(float *__restrict__, int, int, float *);
+template __global__ void kernel_temporal_traditional<double, HALO>(double *__restrict__, int, int, double *, double *);
+template __global__ void kernel_temporal_traditional<float, HALO>(float *__restrict__, int, int, float *, float *);

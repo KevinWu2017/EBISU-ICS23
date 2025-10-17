@@ -14,5 +14,5 @@ __global__ void kernel_temporal(REAL *__restrict__  input, int width_y, int widt
 
 template<class REAL, int halo, int ipt=ipts<halo,curshape,REAL>::val, int tstep=timesteps<halo,curshape,ipt,REAL>::val>
 __global__ void kernel_temporal_traditional(REAL *__restrict__  input, int width_y, int width_x, 
-  REAL *  __var_4__);
+  REAL *  __var_4__, REAL * filter_gm);
 

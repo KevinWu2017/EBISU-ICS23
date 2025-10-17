@@ -11,7 +11,7 @@
 namespace cg = cooperative_groups;
 template <class REAL, int halo, int LOCAL_TILE_Y, int LOCAL_DEPTH>
 __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_y, int width_x,
-                                            REAL *__var_4__)
+                                            REAL *__var_4__, REAL *filter_gm)
 {
 
   stencilParaT;
@@ -102,7 +102,7 @@ __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_
                                                   sm_rbuffers, basesm_y[LOCAL_DEPTH - step], sm_range_y,
                                                   local_x + ps_x, tile_x_with_halo,
                                                   r_smbuffer[LOCAL_DEPTH - step], halo,
-                                                  filter);
+                                                  filter_gm);
       }
       // lazy streaming can not further reduce synchronization
       // because can not further apply register lazy streaming due to possibily register pressure
@@ -130,5 +130,5 @@ __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_
   }
 }
 
-template __global__ void kernel_temporal_traditional<double, HALO>(double *__restrict__, int, int, double *);
-template __global__ void kernel_temporal_traditional<float, HALO>(float *__restrict__, int, int, float *);
+template __global__ void kernel_temporal_traditional<double, HALO>(double *__restrict__, int, int, double *, double *);
+template __global__ void kernel_temporal_traditional<float, HALO>(float *__restrict__, int, int, float *, float *);

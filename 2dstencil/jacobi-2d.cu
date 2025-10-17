@@ -68,7 +68,7 @@ template void getExperimentSetting<float>(int *, int *, int *, int);
 /// @param width_y
 /// @param o
 template <class REAL>
-__forceinline__ void exchangeio(REAL *&i, int width_x, int width_y, REAL *&o)
+__forceinline__ void exchangeio(REAL *&i, int width_x, int width_y, REAL *&o, REAL *filter)
 {
   REAL *tmp = i;
   i = o;
@@ -101,6 +101,17 @@ int jacobi_iterative(REAL *h_input, int width_y, int width_x, REAL *__var_0__,
   cudaMalloc(&__var_1__, sizeof(REAL) * ((width_y - 0) * (width_x - 0)));
   REAL *__var_2__;
   cudaMalloc(&__var_2__, sizeof(REAL) * ((width_y - 0) * (width_x - 0)));
+  REAL filter_h[HALO * 2 + 1][HALO * 2 + 1];
+  for (int i = 0; i < HALO * 2 + 1; i++)
+  {
+    for (int j = 0; j < HALO * 2 + 1; j++)
+    {
+      filter_h[i][j] = 1.0 / ((HALO * 2 + 1) * (HALO * 2 + 1));
+    }
+  }
+  REAL *__var_filter__;
+  cudaMalloc(&__var_filter__, sizeof(REAL) * (HALO * 2 + 1) * (HALO * 2 + 1));
+  cudaMemcpy(__var_filter__, filter_h, sizeof(REAL) * (HALO * 2 + 1) * (HALO * 2 + 1), cudaMemcpyHostToDevice);
 
   // initialize shared memory
   int maxSharedMemory;
@@ -142,7 +153,7 @@ int jacobi_iterative(REAL *h_input, int width_y, int width_x, REAL *__var_0__,
   if (usewarmup)
   {
     myLauncher.warmup(execute_kernel, exchangeio<REAL>, executeGridDim, executeBlockDim, executeSM, 0,
-                      __var_1__, width_y, width_x, __var_2__);
+                      __var_1__, width_y, width_x, __var_2__, __var_filter__);
   }
 
   cudaEvent_t _forma_timer_start_, _forma_timer_stop_;
@@ -152,12 +163,12 @@ int jacobi_iterative(REAL *h_input, int width_y, int width_x, REAL *__var_0__,
 
   {
     myLauncher.launch(execute_kernel, executeGridDim, executeBlockDim, executeSM, 0,
-                      input, width_y, width_x, __var_2__);
+                      input, width_y, width_x, __var_2__, __var_filter__);
 
     for (int i = TSTEP; i < iteration; i += TSTEP)
     {
       myLauncher.launch(execute_kernel, executeGridDim, executeBlockDim, executeSM, 0,
-                        __var_2__, width_y, width_x, __var_1__);
+                        __var_2__, width_y, width_x, __var_1__, __var_filter__);
       REAL *tmp = __var_2__;
       __var_2__ = __var_1__;
       __var_1__ = tmp;

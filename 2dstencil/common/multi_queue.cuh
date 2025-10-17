@@ -231,7 +231,7 @@ __device__ void __forceinline__ computation_box(REAL result[RESULT_SIZE],
                                             int sm_y_base, int sm_y_range, int sm_x_ind,int sm_width, 
                                             REAL r_ptr[2*halo+1][CACHESIZE],
                                             int reg_base, 
-                                            const REAL filter[halo*2+1][halo*2+1]
+                                            REAL *filter
                                           )
 {
 
@@ -244,14 +244,15 @@ __device__ void __forceinline__ computation_box(REAL result[RESULT_SIZE],
       _Pragma("unroll")
       for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
       {
-        result[l_y]+=filter[hl_y+halo][hl_x+halo]*r_ptr[hl_x+halo][hl_y+halo+l_y];
+        // result[l_y]+=filter[hl_y+halo][hl_x+halo]*r_ptr[hl_x+halo][hl_y+halo+l_y];
+        result[l_y]+=filter[((hl_y+halo) * (2 * halo + 1)) + hl_x+halo]*r_ptr[hl_x+halo][hl_y+halo+l_y];
       }
     }
 
     _Pragma("unroll")
     for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
     {
-      result[l_y]+=filter[hl_y+halo][0+halo]*r_ptr[0+halo][hl_y+reg_base+l_y];
+      result[l_y]+=filter[((hl_y+halo) * (2 * halo + 1)) +0+halo]*r_ptr[0+halo][hl_y+reg_base+l_y];
     }
     _Pragma("unroll")
     for(int hl_x=1; hl_x<=halo; hl_x++)
@@ -259,7 +260,7 @@ __device__ void __forceinline__ computation_box(REAL result[RESULT_SIZE],
       _Pragma("unroll")
       for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
       {
-        result[l_y]+=filter[hl_y+halo][hl_x+halo]*r_ptr[hl_x+halo][hl_y+halo+l_y];
+        result[l_y]+=filter[((hl_y+halo) * (2 * halo + 1)) +hl_x+halo]*r_ptr[hl_x+halo][hl_y+halo+l_y];
       }
     }
   }
