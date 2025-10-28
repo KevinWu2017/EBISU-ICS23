@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #star
-# add_subdirectory(2d5pt)
+add_subdirectory(2d5pt)
 # add_subdirectory(2d13pt)
 #add_subdirectory(2ds9pt)
 
