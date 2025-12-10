@@ -18,6 +18,10 @@
 #define TIMESTEPS_HALO1_STAR_TILEY4_DOUBLE 4
 #endif
 
+#ifndef TIMESTEPS_HALO2_BOX_TILEY8_FLOAT
+#define TIMESTEPS_HALO2_BOX_TILEY8_FLOAT 6
+#endif
+
 template<int halo, int shape, int ipt, class REAL>
 struct timesteps
 {
@@ -85,6 +89,7 @@ struct timesteps< 2,  box_shape,  4,  double>
 template<>
 struct timesteps< 2,  box_shape,  8,  float>
 {
-  static int const val = 6;//7;
+  // static int const val = 6;//7;
+  static int const val = TIMESTEPS_HALO2_BOX_TILEY8_FLOAT;
 };
 
