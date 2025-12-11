@@ -140,12 +140,15 @@ int j3d_iterative(REAL *h_input,
   cudaMalloc(&__var_2__, sizeof(REAL) * (height * width_x * width_y));
   Check_CUDA_Error("Allocation Error!! : __var_2__\n");
 
-  REAL* filter_h;
-  for (int i = 0; i < (2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1); i++)
-  {
-    filter_h[i] = ((REAL)(i)) / ((2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1));
-  }
+  REAL filter_h[2 * HALO + 1][2 * HALO + 1][2 * HALO + 1];
   size_t filter_size = (2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1);
+  for (int i = 0; i < 2 * HALO + 1; ++i) {
+    for (int j = 0; j < 2 * HALO + 1; ++j) {
+      for (int k = 0; k < 2 * HALO + 1; ++k) {
+        filter_h[i][j][k] = ((REAL)(i * (2 * HALO + 1) * (2 * HALO + 1) + j * (2 * HALO + 1) + k)) / filter_size;
+      }
+    }
+  }
   REAL* __var_filter__;
   cudaMalloc(&__var_filter__, sizeof(REAL) * filter_size);
   Check_CUDA_Error("Allocation Error!! : __var_filter__\n");
