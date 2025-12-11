@@ -33,6 +33,14 @@ set(COMPILECG " -rdc=true ")
 
 set(DEFAULT_COMPILER_FLAG "-D_TIMER_ -Xptxas \"-v \" ${archlist}")
 
+if(DEFINED TIMESTEPS_HALO1_BOX_TILEY8_FLOAT)
+    string(APPEND DEFAULT_COMPILER_FLAG " -DTIMESTEPS_HALO1_BOX_TILEY8_FLOAT=${TIMESTEPS_HALO1_BOX_TILEY8_FLOAT}")
+endif()
+
+if(DEFINED TIMESTEPS_HALO1_BOX_TILEY4_DOUBLE)
+    string(APPEND DEFAULT_COMPILER_FLAG " -DTIMESTEPS_HALO1_BOX_TILEY4_DOUBLE=${TIMESTEPS_HALO1_BOX_TILEY4_DOUBLE}")
+endif()
+
 function(subcompile prefix default_compiler_flag aim)
     message("aim is ${aim}")
     message("prefix is ${prefix}")
