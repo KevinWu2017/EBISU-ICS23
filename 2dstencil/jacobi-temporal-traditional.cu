@@ -111,7 +111,7 @@ __global__ void kernel_temporal_traditional(REAL *__restrict__ input, int width_
                                         sm_rbuffers, sm_mqueue_index[step], sm_range_y,
                                         0, (local_x + rind_x), tile_x_with_halo, blockDim.x,
                                         r_smbuffer[step], halo,
-                                        west, east, north, south, center);
+                                        west, east, north, south, center, filter_gm);
     }
     // Lazy enqueue for next tiling in the following time steps.
     regEnqueues<REAL, LOCAL_DEPTH, LOCAL_TILE_Y * 2 + 2 * halo, LOCAL_TILE_Y, LOCAL_TILE_Y + 2 * halo, 0, LOCAL_TILE_Y>(r_smbuffer, sum);

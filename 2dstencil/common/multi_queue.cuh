@@ -166,9 +166,14 @@ __device__ void __forceinline__ compute(REAL result[RESULT_SIZE],
                                             int reg_base, 
                                             const REAL west[2],const REAL east[2], 
                                             const REAL north[2],const REAL south[2],
-                                            const REAL center 
+                                            const REAL center, REAL* filter
                                           )
 {
+  REAL* gm_west = filter + 0;
+  REAL* gm_east = filter + 3;
+  REAL* gm_north = filter + 6;
+  REAL* gm_south = filter + 9;
+  REAL* gm_center = filter + 12;
   {
     int indexy[RESULT_SIZE];
     _Pragma("unroll")
@@ -182,7 +187,7 @@ __device__ void __forceinline__ compute(REAL result[RESULT_SIZE],
       _Pragma("unroll")
       for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
       {
-        result[l_y]+=sm_ptr[indexy[l_y]+((sm_x_ind+1+hl)&(sm_x_range-1))+sm_x_base]*east[hl];
+        result[l_y]+=sm_ptr[indexy[l_y]+((sm_x_ind+1+hl)&(sm_x_range-1))+sm_x_base]*gm_east[hl];
       }
     }
     _Pragma("unroll")
@@ -191,7 +196,7 @@ __device__ void __forceinline__ compute(REAL result[RESULT_SIZE],
       for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
       {
 
-        result[l_y]+=sm_ptr[indexy[l_y]+((sm_x_ind-1-(halo-1-hl))&(sm_x_range-1))+sm_x_base]*west[halo-1-hl];
+        result[l_y]+=sm_ptr[indexy[l_y]+((sm_x_ind-1-(halo-1-hl))&(sm_x_range-1))+sm_x_base]*gm_west[halo-1-hl];
       }
     }
   }
@@ -202,14 +207,14 @@ __device__ void __forceinline__ compute(REAL result[RESULT_SIZE],
     _Pragma("unroll")
     for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
     {
-      result[l_y]+=r_ptr[reg_base+l_y-1-hl]*south[hl];
+      result[l_y]+=r_ptr[reg_base+l_y-1-hl]*gm_south[hl];
     }
   }
   //center
   _Pragma("unroll")
   for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
   {
-    result[l_y]+=r_ptr[reg_base+l_y]*center;
+    result[l_y]+=r_ptr[reg_base+l_y]*gm_center[0];
   }
   //north
   _Pragma("unroll")
@@ -218,7 +223,7 @@ __device__ void __forceinline__ compute(REAL result[RESULT_SIZE],
     _Pragma("unroll")
     for(int l_y=0; l_y<RESULT_SIZE ; l_y++)
     {
-      result[l_y]+=r_ptr[reg_base+l_y+1+hl]*north[hl];
+      result[l_y]+=r_ptr[reg_base+l_y+1+hl]*gm_north[hl];
     }
   }
 }
