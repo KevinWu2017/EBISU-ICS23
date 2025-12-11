@@ -4,8 +4,10 @@ __device__ void __forceinline__ computation_box(REAL sum[RESULT_SIZE],
                                             REAL* smbuffer_buffer_ptr[SMZ_SIZE], int SMZ_BASE,
                                             int sm_y_base, int sm_width, int sm_x_ind,
                                             REAL r_smbuffer[REGZ_SIZE][REGY_SIZE][2*halo+1],int REGZ_BASE, 
-                                            const REAL filter[halo*2+1][halo*2+1][halo*2+1])
+                                            const REAL filter[halo*2+1][halo*2+1][halo*2+1],
+                                            REAL* filter_gm)
 {
+    const REAL (*filter_buf)[2*halo+1][2*halo+1] = reinterpret_cast<const REAL (*)[2*halo+1][2*halo+1]>(filter_gm);
 
     //botten & middle from register
     _Pragma("unroll")
@@ -20,7 +22,7 @@ __device__ void __forceinline__ computation_box(REAL sum[RESULT_SIZE],
           _Pragma("unroll")
           for(int l_y=0; l_y<RESULT_SIZE; l_y++)
           {
-            sum[l_y]+=filter[hl_z+halo][hl_y+halo][hl_x+halo]*
+            sum[l_y]+=filter_buf[hl_z+halo][hl_y+halo][hl_x+halo]*
               r_smbuffer[hl_z+REGZ_BASE][hl_y+halo+l_y][hl_x+halo];
           }
         }
@@ -39,7 +41,7 @@ __device__ void __forceinline__ computation_box(REAL sum[RESULT_SIZE],
           _Pragma("unroll")
           for(int l_y=0; l_y<RESULT_SIZE; l_y++)
           {
-            sum[l_y]+=filter[hl_z+halo][hl_y+halo][hl_x+halo]*
+            sum[l_y]+=filter_buf[hl_z+halo][hl_y+halo][hl_x+halo]*
               smbuffer_buffer_ptr[hl_z+SMZ_BASE][(l_y+hl_y+sm_y_base)*sm_width+hl_x+sm_x_ind];
           }
         }

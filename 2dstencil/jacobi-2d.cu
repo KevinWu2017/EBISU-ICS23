@@ -106,7 +106,7 @@ int jacobi_iterative(REAL *h_input, int width_y, int width_x, REAL *__var_0__,
   {
     for (int j = 0; j < HALO * 2 + 1; j++)
     {
-      filter_h[i][j] = 1.0 / ((HALO * 2 + 1) * (HALO * 2 + 1));
+      filter_h[i][j] = ((REAL)(i * (HALO * 2 + 1) + j)) / ((HALO * 2 + 1) * (HALO * 2 + 1));
     }
   }
   REAL *__var_filter__;

@@ -140,6 +140,18 @@ int j3d_iterative(REAL *h_input,
   cudaMalloc(&__var_2__, sizeof(REAL) * (height * width_x * width_y));
   Check_CUDA_Error("Allocation Error!! : __var_2__\n");
 
+  REAL* filter_h;
+  for (int i = 0; i < (2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1); i++)
+  {
+    filter_h[i] = ((REAL)(i)) / ((2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1));
+  }
+  size_t filter_size = (2 * HALO + 1) * (2 * HALO + 1) * (2 * HALO + 1);
+  REAL* __var_filter__;
+  cudaMalloc(&__var_filter__, sizeof(REAL) * filter_size);
+  Check_CUDA_Error("Allocation Error!! : __var_filter__\n");
+  cudaMemcpy(__var_filter__, filter_h, sizeof(REAL) * filter_size, cudaMemcpyHostToDevice);
+
+
   // L2 cache persistent might be useful
   size_t L2_utage = (TSTEP * executeGridDim.z * executeGridDim.y * HALO * width_x * 2 + TSTEP * executeGridDim.x * executeGridDim.z * HALO * width_y * 2);
   REAL *l2_cache;
@@ -165,7 +177,8 @@ int j3d_iterative(REAL *h_input,
     myLauncher.warmup(execute_kernel, executeGridDim, executeBlockDim, executeSM, 0,
                       __var_2__, __var_1__,
                       height, width_y, width_x,
-                      l2_cache1, l2_cache2);
+                      l2_cache1, l2_cache2,
+                      __var_filter__);
   }
 
   cudaEvent_t _forma_timer_start_, _forma_timer_stop_;
@@ -176,14 +189,16 @@ int j3d_iterative(REAL *h_input,
   myLauncher.launch(execute_kernel, executeGridDim, executeBlockDim, executeSM, 0,
                     input, __var_2__,
                     height, width_y, width_x,
-                    l2_cache1, l2_cache2);
+                    l2_cache1, l2_cache2,
+                    __var_filter__);
 
   for (int i = TSTEP; i < iteration; i += TSTEP)
   {
     myLauncher.launch(execute_kernel, executeGridDim, executeBlockDim, executeSM, 0,
                       __var_2__, __var_1__,
                       height, width_y, width_x,
-                      l2_cache1, l2_cache2);
+                      l2_cache1, l2_cache2,
+                      __var_filter__);
 
     REAL *tmp = __var_2__;
     __var_2__ = __var_1__;

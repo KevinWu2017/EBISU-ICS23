@@ -31,7 +31,8 @@ __global__ void
 kernel3d_temporal(REAL * __restrict__ input, 
                                 REAL *  output, 
                                 int width_z, int width_y, int width_x,
-                                REAL* l2_cache_i, REAL* l2_cache_o) 
+                                REAL* l2_cache_i, REAL* l2_cache_o,
+                                REAL* filter_gm) 
 {
   int gdim_y = (BLOCKDIM / LOCAL_TILE_X);
 
@@ -137,7 +138,7 @@ kernel3d_temporal(REAL * __restrict__ input,
                                           sm_mque,SIZEOFSM-(step)*(SMQUESIZE),
                                           ps_y+index_y, tile_x_with_halo, tid_x+ps_x,
                                           reg_mque,SIZEOFREG-(step)*(REGQUESIZE)+halo,
-                                          filter);
+                                          filter, filter_gm);
           //no lazy streaming, synchronization inside time step become inavoidable
           __syncthreads();
           smEnqueue<REAL,LOCAL_ITEM_PER_THREAD >(sm_mque[SIZEOFSM-(step)*(SMQUESIZE)],ps_y+index_y, ps_x+tid_x, tile_x_with_halo, tile_y_with_halo,
@@ -187,7 +188,7 @@ kernel3d_temporal(REAL * __restrict__ input,
                 sm_mque,SIZEOFSM-(MQSIZE)*(SMQUESIZE),
                 ps_y+index_y, tile_x_with_halo, tid_x+ps_x,
                 reg_mque,SIZEOFREG-(MQSIZE)*(REGQUESIZE)+halo,
-                filter);
+                filter, filter_gm);
         
         
         //star version can use multi-buffer to remove the necessarity of two sync
@@ -429,5 +430,5 @@ kernel3d_temporal(REAL * __restrict__ input,
   }
 }
 
-template __global__ void kernel3d_temporal<double, HALO>(double *__restrict__, double *, int, int, int, double *, double *);
-template __global__ void kernel3d_temporal<float, HALO>(float *__restrict__, float *, int, int, int, float *, float *);
+template __global__ void kernel3d_temporal<double, HALO>(double *__restrict__, double *, int, int, int, double *, double *, double *);
+template __global__ void kernel3d_temporal<float, HALO>(float *__restrict__, float *, int, int, int, float *, float *, float *);

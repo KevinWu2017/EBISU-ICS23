@@ -29,7 +29,8 @@ __global__ void
 kernel3d_temporal(REAL *__restrict__ input,
                   REAL *output,
                   int width_z, int width_y, int width_x,
-                  REAL *l2_cache_i, REAL *l2_cache_o)
+                  REAL *l2_cache_i, REAL *l2_cache_o,
+                  REAL *filter_gm)
 {
   
 static constexpr int const REG_Y_SIZE_MOD = LOCAL_ITEM_PER_THREAD;    
@@ -121,7 +122,7 @@ static constexpr int const REG_Y_SIZE_MOD = LOCAL_ITEM_PER_THREAD;
                                                                        sm_mque + SIZEOFSM - (step) * (SMQUESIZE) - 1,
                                                                        ps_y + index_y, tile_x_with_halo, tid_x + ps_x,
                                                                        reg_mque + SIZEOFREG - step * REGQUESIZE,
-                                                                       west,east,north,south,top,bottom,center);
+                                                                       west,east,north,south,top,bottom,center, filter_gm);
       }
       // star version can use multi-buffer to remove the necessarity of two sync
       __syncthreads();
@@ -173,7 +174,7 @@ static constexpr int const REG_Y_SIZE_MOD = LOCAL_ITEM_PER_THREAD;
                                                                      sm_mque,
                                                                      ps_y + index_y, tile_x_with_halo, tid_x + ps_x,
                                                                      reg_mque,
-                                                                     west,east,north,south,top,bottom,center);
+                                                                     west,east,north,south,top,bottom,center, filter_gm);
 
       // star version can use multi-buffer to remove the necessarity of two sync
       int global_z2 = global_z - (QUESIZE) * (MQSIZE - 1);
@@ -374,5 +375,5 @@ static constexpr int const REG_Y_SIZE_MOD = LOCAL_ITEM_PER_THREAD;
 
 }
 
-template __global__ void kernel3d_temporal<double, HALO>(double *__restrict__, double *, int, int, int, double *, double *);
-template __global__ void kernel3d_temporal<float, HALO>(float *__restrict__, float *, int, int, int, float *, float *);
+template __global__ void kernel3d_temporal<double, HALO>(double *__restrict__, double *, int, int, int, double *, double *, double *);
+template __global__ void kernel3d_temporal<float, HALO>(float *__restrict__, float *, int, int, int, float *, float *, float *);

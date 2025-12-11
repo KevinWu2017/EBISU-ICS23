@@ -34,7 +34,8 @@ template<class REAL, int halo, int blockdim=256,
   int sizeofsm=smquesize*mqsize+(curshape==1), int sizeofreg=regquesize*mqsize>
 __global__ void kernel3d_temporal(REAL* __restrict__ input, REAL* output,
                                   int height, int width_y, int width_x, 
-                                  REAL * l2_cache_i, REAL * l2_cache_o); 
+                                  REAL * l2_cache_i, REAL * l2_cache_o,
+                                  REAL * filter_gm); 
 
 
 

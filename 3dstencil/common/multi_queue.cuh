@@ -233,8 +233,15 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
                                             REAL *smques[SMZ_SIZE],
                                             int sm_y_base, int sm_width, int sm_x_ind,
                                             REAL regques[REGZ_SIZE][TILERANGE],
-                                            const REAL west[HALO], const REAL east[HALO], const REAL north[HALO], const REAL south[HALO], const REAL top[HALO], const REAL bottom[HALO], const REAL center)
+                                            const REAL west[HALO], const REAL east[HALO], const REAL north[HALO], const REAL south[HALO], const REAL top[HALO], const REAL bottom[HALO], const REAL center, REAL* filter_gm)
 {
+    REAL* west_gm = filter_gm;
+    REAL* east_gm = filter_gm + halo;
+    REAL* north_gm = filter_gm + 2 * halo;
+    REAL* south_gm = filter_gm + 3 * halo;
+    REAL* top_gm = filter_gm + 4 * halo;
+    REAL* bottom_gm = filter_gm + 5 * halo;
+    REAL* center_gm = filter_gm + 6 * halo;
     _Pragma("unroll") for (int hl = 0; hl < halo; hl++)
     {
         _Pragma("unroll") for (int l_y = 0; l_y < TILERANGE; l_y++)
@@ -247,13 +254,13 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
         int sm_y_ind = sm_width * (l_y + sm_y_base);
         _Pragma("unroll") for (int hl = 0; hl < halo; hl++)
         {
-            result[l_y] += west[hl] *
+            result[l_y] += west_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind - 1 - hl];
-            result[l_y] += east[hl] *
+            result[l_y] += east_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind + 1 + hl];
-            result[l_y] += north[hl] *
+            result[l_y] += north_gm[hl] *
                            smques[0][sm_width * (1 + hl) + sm_y_ind + sm_x_ind];
-            result[l_y] += south[hl] *
+            result[l_y] += south_gm[hl] *
                            smques[0][-sm_width * (1 + hl) + sm_y_ind + sm_x_ind];
         }
     }
@@ -262,9 +269,9 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
         int sm_y_ind = sm_width * (l_y + sm_y_base);
         _Pragma("unroll") for (int hl = 0; hl < halo; hl++)
         {
-            result[l_y] += west[hl] *
+            result[l_y] += west_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind - 1 - hl];
-            result[l_y] += east[hl] *
+            result[l_y] += east_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind + 1 + hl];
         }
     }
@@ -274,9 +281,9 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
         {
 
             result[l_y] +=
-                north[hl] * regques[REG_BASE][l_y + 1 + hl];
+                north_gm[hl] * regques[REG_BASE][l_y + 1 + hl];
             result[l_y] +=
-                south[hl] * regques[REG_BASE][l_y - 1 - hl];
+                south_gm[hl] * regques[REG_BASE][l_y - 1 - hl];
         }
     }
     _Pragma("unroll") for (int l_y = TILERANGE - halo; l_y < TILERANGE; l_y++)
@@ -284,13 +291,13 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
         int sm_y_ind = sm_width * (l_y + sm_y_base);
         _Pragma("unroll") for (int hl = 0; hl < halo; hl++)
         {
-            result[l_y] += west[hl] *
+            result[l_y] += west_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind - 1 - hl];
-            result[l_y] += east[hl] *
+            result[l_y] += east_gm[hl] *
                            smques[0][sm_y_ind + sm_x_ind + 1 + hl];
-            result[l_y] += north[hl] *
+            result[l_y] += north_gm[hl] *
                            smques[0][sm_width * (1 + hl) + sm_y_ind + sm_x_ind];
-            result[l_y] += south[hl] *
+            result[l_y] += south_gm[hl] *
                            smques[0][-sm_width * (1 + hl) + sm_y_ind + sm_x_ind];
         }
     }
@@ -299,11 +306,11 @@ __device__ void __forceinline__ computation(REAL result[TILERANGE],
     {
         _Pragma("unroll") for (int l_y = 0; l_y < TILERANGE; l_y++)
         {
-            result[l_y] += top[hl] * smques[0 + hl + 1][sm_width * (l_y + sm_y_base) + sm_x_ind];
+            result[l_y] += top_gm[hl] * smques[0 + hl + 1][sm_width * (l_y + sm_y_base) + sm_x_ind];
         }
     }
     _Pragma("unroll") for (int l_y = 0; l_y < TILERANGE; l_y++)
     {
-        result[l_y] += center * regques[REG_BASE][l_y];
+        result[l_y] += center_gm[0] * regques[REG_BASE][l_y];
     }
 }
