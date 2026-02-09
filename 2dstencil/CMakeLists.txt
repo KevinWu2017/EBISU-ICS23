@@ -17,4 +17,5 @@ add_subdirectory(2ds9pt)
 add_subdirectory(2d9pt)
 add_subdirectory(2d25pt)
 add_subdirectory(2d49pt)
+add_subdirectory(2d225pt)
 
