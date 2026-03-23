@@ -32,6 +32,8 @@ set(DEFAULT_COMPILER_FLAG "-D_TIMER_ ")
 set(COMPILECG " -rdc=true ")
 
 set(DEFAULT_COMPILER_FLAG "-D_TIMER_ -Xptxas \"-v \" ${archlist}")
+# Export host stubs for __global__ template kernels across translation units.
+string(APPEND DEFAULT_COMPILER_FLAG " --static-global-template-stub=false")
 
 if(DEFINED TIMESTEPS_HALO1_STAR_TILEY8_FLOAT)
     string(APPEND DEFAULT_COMPILER_FLAG " -DTIMESTEPS_HALO1_STAR_TILEY8_FLOAT=${TIMESTEPS_HALO1_STAR_TILEY8_FLOAT}")

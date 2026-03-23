@@ -25,6 +25,8 @@ set(archlist " -gencode arch=compute_80,code=sm_80 ")
 string(APPEND archlist " -gencode arch=compute_90,code=sm_90 ")
 
 set(DEFAULT_COMPILER_FLAG "-D_TIMER_ ")
+# Export host stubs for __global__ template kernels across translation units.
+string(APPEND DEFAULT_COMPILER_FLAG " --static-global-template-stub=false")
 
 if(DEFINED TIMESTEPS_HALO1_STAR_TILEY8_FLOAT)
     string(APPEND DEFAULT_COMPILER_FLAG " -DTIMESTEPS_HALO1_STAR_TILEY8_FLOAT=${TIMESTEPS_HALO1_STAR_TILEY8_FLOAT}")
@@ -72,7 +74,7 @@ function(subcompile prefix default_compiler_flag aim)
     set_target_properties(${local_goal}
                       PROPERTIES LANGUAGES CUDA LINKER_LANGUAGE CUDA)
     set_target_properties("${local_goal}" PROPERTIES CUDA_ARCHITECTURES "80;90")
-    set_target_properties(${local_goal} PROPERTIES COMPILE_FLAGS "${local_compiler_flag} ")
+    set_target_properties(${local_goal} PROPERTIES COMPILE_FLAGS " -D${aim} ")
     set_target_properties(${local_goal} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
 

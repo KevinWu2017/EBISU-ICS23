@@ -32,6 +32,8 @@ set(DEFAULT_COMPILER_FLAG "-D_TIMER_ ")
 set(COMPILECG " -rdc=true ")
 
 set(DEFAULT_COMPILER_FLAG "-D_TIMER_ -Xptxas \"-v \" ${archlist}")
+# Export host stubs for __global__ template kernels across translation units.
+string(APPEND DEFAULT_COMPILER_FLAG " --static-global-template-stub=false")
 
 function(subcompile prefix default_compiler_flag aim)
     message("aim is ${aim}")
